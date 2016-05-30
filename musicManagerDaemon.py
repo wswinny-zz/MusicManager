@@ -10,6 +10,8 @@ cur = db.cursor()
 
 songQueue = list()		#Holds song but in what form name, id?
 playSet	  = set()		#Holds elements of songQueue to be played
+suffle    = False		#true - on, false - off
+repeat    = True		#true - on, false - off
 
 thePeoplesMutex = threading.Lock()
 
@@ -19,6 +21,8 @@ def execQuery(query):
 
 def addSong(songID):
 	try:
+		songQueue.append(songID)
+		
 		thePeoplesMutex.acquire()
 		#code goes here
 	finally:
