@@ -13,6 +13,10 @@ playSet	  = set()		#Holds elements of songQueue to be played
 
 thePeoplesMutex = threading.Lock()
 
+def execQuery(query):
+	cur.execute(query)
+	return cur.fetchall()
+
 def addSong(songID):
 	try:
 		thePeoplesMutex.acquire()
@@ -50,3 +54,5 @@ if __name__ == "__main__":
 
 	data,address = socket.recvfrom(16)
 	print "recv: ", data
+
+	db.close()
