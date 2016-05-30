@@ -27,11 +27,12 @@ cur = db.cursor()
 musicDirectory = "/home/pi/Music/"
 SONGEND = pygame.USEREVENT + 1
 
-songQueue = list()		#Holds song but in what form name, id?
+songQueue = list()							#Holds song but in what form name, id?
 playSet	  = set([1,2,3,4,5,6,7,8,9])		#Holds elements of songQueue to be played
 
-shuffle   = False		#true - on, false - off
-repeat    = False		#true - on, false - off
+
+shuffle   = False							#true - on, false - off
+repeat    = False							#true - on, false - off
 
 thePeoplesMutex = threading.Lock()
 
@@ -51,7 +52,7 @@ def addSong(songID):
 
 #adds all songs in a playlist to the songQueue by their ids and updates the playSet
 def addPlaylist(playlistID):
-	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = \'" + str(playlistID) + "\'"):
+	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = " + str(playlistID) + ";"):
 		try:
 			songQueue.append(row[0])
 			thePeoplesMutex.acquire()
@@ -80,13 +81,14 @@ def repeat():
 	repeat = not repeat
 
 def pause():
-	return
+	pygame.mixer.music.pause()
 
 def resume():
-	return
+	pygame.mixer.music.unpause()
 
 def repopulate():
-	return
+	for index in range(len(songQueue)):
+		playSet.add(index)
 
 def playsong(songID):
 	result = execQuery("SELECT artistName, songName FROM Song LEFT JOIN Artist ON Song.artist = Artist.idArtist WHERE idSong = " + str(songID) + ";")
