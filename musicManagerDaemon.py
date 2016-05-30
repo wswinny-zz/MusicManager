@@ -24,6 +24,7 @@ def execQuery(query):
 	cur.execute(query)
 	return cur.fetchall()
 
+#adds song to sognQueue by its id and updates the playSet
 def addSong(songID):
 	try:
 		songQueue.append(songID)
@@ -33,8 +34,9 @@ def addSong(songID):
 	finally:
 		thePeoplesMutex.release()
 
+#adds all songs in a playlist to the songQueue by their ids and updates the playSet
 def addPlaylist(playlistID):
-	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = '" + playlistID + "'")
+	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = \'" + str(playlistID) + "\'"):
 		try:
 			songQueue.append(row[0])
 			thePeoplesMutex.acquire()
@@ -43,6 +45,7 @@ def addPlaylist(playlistID):
 		finally:
 			thePeoplesMutex.release()
 
+#clears the queue
 def clear():
 	try:
 		songQueue = list()
@@ -56,15 +59,18 @@ def skip(direction):
 	return
 
 def shuffle():
-	shuffle = !shuffle
+	shuffle = not shuffle
 
 def repeat():
-	repeat = !repeat
+	repeat = not repeat
 
 def pause():
-	
+	return
 
 def resume():
+	return
+
+def repopulate():
 	return
 
 def playsong(songID):
