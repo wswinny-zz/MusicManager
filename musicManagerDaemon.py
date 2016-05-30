@@ -7,16 +7,8 @@ import MySQLdb
 db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5CFT^cft6", db="MusicManager")
 cur = db.cursor()
 
-songQueue = list();									#Holds song but in what form name, id?
-playSet	  = set();									#Holds elements of songQueue to be played
-
-#Main waits for messages from PHP on port 42069
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(('',42069))
-while True:
-    data,address = s.recvfrom(16)
-    print "recv: ", data
-    time.sleep(1);
+songQueue = list()		#Holds song but in what form name, id?
+playSet	  = set()		#Holds elements of songQueue to be played
 
 def addSong(songID):
 	return
@@ -45,5 +37,11 @@ def resume():
 def runSongThread():
 	return
 
+def getNextMessage(socket):
+	data,address = socket.recvfrom(16)
+	print "recv: ", data
+	time.sleep(1)
+
 if __name__ == "__main__":
-	return
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('',42069))
