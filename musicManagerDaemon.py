@@ -15,7 +15,7 @@ musicDirectory = "/home/pi/Music/"
 songQueue = list()		#Holds song but in what form name, id?
 playSet	  = set([1,2,3,4,5,6,7,8,9])		#Holds elements of songQueue to be played
 
-suffle    = False		#true - on, false - off
+shuffle   = False		#true - on, false - off
 repeat    = False		#true - on, false - off
 
 thePeoplesMutex = threading.Lock()
@@ -27,29 +27,42 @@ def execQuery(query):
 def addSong(songID):
 	try:
 		songQueue.append(songID)
-		
 		thePeoplesMutex.acquire()
-		#code goes here
+		playSet.add(songQueue.index(songID))
+
 	finally:
 		thePeoplesMutex.release()
 
 def addPlaylist(playlistID):
-	return
+	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = '" + playlistID + "'")
+		try:
+			songQueue.append(row[0])
+			thePeoplesMutex.acquire()
+			playSet.add(songQueue.index(row[0]))
+			
+		finally:
+			thePeoplesMutex.release()
 
 def clear():
-	return
+	try:
+		songQueue = list()
+		thePeoplesMutex.acquire()
+		playSet.clear
+
+	finally:
+		thePeoplesMutex.release()
 
 def skip(direction):
 	return
 
-def shuffle(isShuffling):
-	return
+def shuffle():
+	shuffle = !shuffle
 
-def repeat(doRepeat):
-	return
+def repeat():
+	repeat = !repeat
 
 def pause():
-	return
+	
 
 def resume():
 	return
