@@ -44,10 +44,9 @@ def resume():
 def runSongThread():
 	return
 
-def getNextMessage(socket):
-	data,address = socket.recvfrom(16)
-	print "recv: ", data
-
 if __name__ == "__main__":
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.bind(('',42069))
+
+	data,address = socket.recvfrom(16)
+	print "recv: ", data
