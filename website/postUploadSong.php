@@ -99,4 +99,9 @@
 	else
 		echo "Upload Failed<br>";
 
+	mysql_close($con);
+
+	header('Location: uploadSong.php');
+	exit;
+
 ?>
