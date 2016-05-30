@@ -1,5 +1,6 @@
 import socket
 import thread
+import threading
 import time
 import MySQLdb
 
@@ -10,8 +11,14 @@ cur = db.cursor()
 songQueue = list()		#Holds song but in what form name, id?
 playSet	  = set()		#Holds elements of songQueue to be played
 
+thePeoplesMutex = threading.Lock()
+
 def addSong(songID):
-	return
+	try:
+		thePeoplesMutex.acquire()
+		#code goes here
+	finally:
+		thePeoplesMutex.release()
 
 def addPlaylist(playlistID):
 	return
@@ -40,7 +47,6 @@ def runSongThread():
 def getNextMessage(socket):
 	data,address = socket.recvfrom(16)
 	print "recv: ", data
-	time.sleep(1)
 
 if __name__ == "__main__":
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
