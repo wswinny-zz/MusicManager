@@ -6,7 +6,6 @@ import MySQLdb
 import os
 import sys
 import pygame
-import pygame.display
 
 #set graphics driver to dummy for headless display
 #WARNING: This line makes it so you have to run the script with sudo
@@ -27,8 +26,9 @@ cur = db.cursor()
 musicDirectory = "/home/pi/Music/"
 SONGEND = pygame.USEREVENT + 1
 
-songQueue = list()		#Holds song but in what form name, id?
-playSet	  = set([1,2,3,4,5,6,7,8,9])		#Holds elements of songQueue to be played
+songQueue = list() #Holds song but in what form name, id?
+songHistory = list() #Holds the play history of the queue
+playSet	= set([1,2,3,4,5,6,7,8,9]) #Holds elements of songQueue to be played
 
 shuffle   = False		#true - on, false - off
 repeat    = False		#true - on, false - off
@@ -98,11 +98,18 @@ def runSongThread():
 	playsong(2)
 
 	while True:
-
 		#pull for events using pygame
 		for event in pygame.event.get():
 			if event.type == SONGEND:
-				print "Music Stoped playing"
+				if len(playSet) == 0 && repeat:
+					repopulate()
+				if len(playSet) > 0 && shuffle:
+					playsong(playSet.pop())
+				if len(playSet) > 0 && not shuffle:
+					nextSong = next(iter(playSet))
+
+					playsong(nextSong)
+					playSet.remove(nextSong)
 
 		time.sleep(0.5)
 
