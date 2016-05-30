@@ -3,14 +3,14 @@ import thread
 import threading
 import time
 import MySQLdb
-
-from pygame import mixer
+import pygame
 
 #connect to database and setup cursor for queries
 db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5CFT^cft6", db="MusicManager")
 cur = db.cursor()
 
 musicDirectory = "/home/pi/Music/"
+SONGEND = pygame.USEREVENT + 1
 
 songQueue = list()		#Holds song but in what form name, id?
 playSet	  = set([1,2,3,4,5,6,7,8,9])		#Holds elements of songQueue to be played
@@ -78,12 +78,24 @@ def playsong(songID):
 	artist = result[0][0]
 	song = result[0][1]
 
-	return musicDirectory + artist + "/" + song
+	songpath = musicDirectory + artist + "/" + song
+
+	pygame.mixer.music.load(songpath)
+	pygame.mixer.music.play(0)
+	pygame.mixer.music.set_endevent(SONGEND)
 
 def runSongThread():
+	playsong(2)
+
 	while True:
-			
+		for event in pygame.event.get():
+			if event.type == SONGEND:
+				print "Music Stoped playing"
+
+		time.sleep(0.5)
 
 if __name__ == "__main__":
-	playsong(2)
+	pygame.mixer.init()
+
+	runSongThread()
 	db.close()
