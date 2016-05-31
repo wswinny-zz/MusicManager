@@ -42,9 +42,8 @@ def execQuery(query):
 #adds song to sognQueue by its id and updates the playSet
 def addSong(songID):
 	try:
-		songQueue.append(songID)
 		thePeoplesMutex.acquire()
-		playSet.add(songQueue.index(songID))
+		songQueue.append(songID)
 
 	finally:
 		thePeoplesMutex.release()
@@ -53,9 +52,8 @@ def addSong(songID):
 def addPlaylist(playlistID):
 	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = " + str(playlistID) + ";"):
 		try:
-			songQueue.append(row[0])
 			thePeoplesMutex.acquire()
-			playSet.add(songQueue.index(row[0]))
+			songQueue.append(row[0])
 			
 		finally:
 			thePeoplesMutex.release()
@@ -63,15 +61,13 @@ def addPlaylist(playlistID):
 #clears the queue
 def clear():
 	try:
-		songQueue = list()
 		thePeoplesMutex.acquire()
-		playSet.clear
+		songQueue = list()
+		songHistory = list()
+		songPtr = 0
 
 	finally:
 		thePeoplesMutex.release()
-
-def skip(direction):
-	return
 
 def shuffle():
 	shuffle = not shuffle
@@ -86,8 +82,8 @@ def resume():
 	pygame.mixer.music.unpause()
 
 def repopulate():
-	for index in range(len(songQueue)):
-		playSet.add(index)
+	songHistory = list()
+	songPtr = 0
 
 def playsong(songID):
 	result = execQuery("SELECT artistName, songName FROM Song LEFT JOIN Artist ON Song.artist = Artist.idArtist WHERE idSong = " + str(songID) + ";")
