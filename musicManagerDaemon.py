@@ -59,6 +59,16 @@ def addPlaylist(playlistID):
 	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = " + str(playlistID) + ";"):
 		addSong(row[0])
 
+#adds all songs in a Artist to the songQueue by their ids and updates the playSet
+def playAllArtist(ArtistID):
+	for row in execQuery("SELECT idSong FROM Song WHERE artist = " + str(ArtistID) + ";"):
+		addSong(row[0])
+
+#adds all songs in a Genre to the songQueue by their ids and updates the playSet
+def playAllGenre(genreID):
+	for row in execQuery("SELECT idSong FROM Song WHERE genere = " + str(genreID) + ";"):
+		addSong(row[0])
+
 #clears the queue
 def clear():
 	try:
