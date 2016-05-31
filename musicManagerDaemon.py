@@ -1,5 +1,4 @@
 import socket
-import thread
 import threading
 import time
 import MySQLdb
@@ -7,6 +6,8 @@ import os
 import sys
 import pygame
 import random
+
+from threading import Thread
 
 #set graphics driver to dummy for headless display
 #WARNING: This line makes it so you have to run the script with sudo
@@ -147,5 +148,43 @@ def runSongThread():
 		time.sleep(0.5)
 
 if __name__ == "__main__":
-	runSongThread()
+
+	try:
+		thread = Thread(target = runSongThread)
+		thread.start()
+	except:
+		print "Error: unable to start thread"
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('',42069))
+
+	while True:
+	    data,address = s.recvfrom(16)
+	    print "Got: ", data, " from ", address
+
+	    data = data.split("-")
+
+	    if data[0] == 's':
+	    	addSong(int(data[1]))
+	    if data[0] == 'p':
+	    	addPlaylist(int(data[1]))
+	    if data[0] == 'sf':
+	    	playNextSong(1)
+	    if data[0] == 'sb':
+	    	playNextSong(-1)
+	    if data[0] == 'son' or data[0] == 'soff':
+	    	shuffle()
+	    if data[0] == 'c':
+	    	clear()
+	    if data[0] == 'ron' or data[0] == 'roff':
+	    	repeat()
+	    if data[0] == 'p':
+	    	pause()
+	    if data[0] == 'r':
+	    	resume()
+	    if data[0] == 'pa':
+	    	playAllArtist(int(data[1]))
+	    if data[0] == 'pg':
+	    	playAllGenre(int(data[1]))
+
 	db.close()
