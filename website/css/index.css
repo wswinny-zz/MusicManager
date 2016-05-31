@@ -1,0 +1,40 @@
+html, body
+{
+	width: 100%;
+	height: auto;
+}
+
+.controls
+{
+	text-align: center;
+}
+
+.control
+{
+	font-size: 32px;
+	color: white;
+	width: 40px;
+	height: 40px;
+	margin: 5px;
+	border-radius: 5px;
+}
+
+.control:hover
+{
+	cursor: pointer;
+}
+
+.addSongButton:hover
+{
+	cursor: pointer;
+}
+
+#mainForm
+{
+	width: 500px;
+	margin: 0 auto;
+	padding: 10px;
+
+	background: #B8B7B7;
+	border-radius: 20px;
+}

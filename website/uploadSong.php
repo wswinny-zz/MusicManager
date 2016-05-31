@@ -5,7 +5,7 @@
 
 		<form action="postUploadSong.php" method="post" enctype="multipart/form-data">
 		    Select song to upload:
-		    <input type="file" name="fileToUpload" id="fileToUpload"><br>
+		    <input type="file" name="files[]" id="fileToUpload" multiple="multiple"><br>
 		    Artist:
 		    <input type="text" name="artist" id="artist"><br>
 		    Genre:
