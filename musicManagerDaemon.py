@@ -48,7 +48,7 @@ def addSong(songID):
 		thePeoplesMutex.acquire()
 		songQueue.append(songID)
 
-		if len(sognQueue) - 1 == len(songHistory) && currentlyPlaying == -1:
+		if len(sognQueue) - 1 == len(songHistory) and currentlyPlaying == -1:
 			playNextSong()
 
 	finally:
@@ -128,8 +128,6 @@ def playsong(songID):
 	currentlyPlaying = songID
 
 def runSongThread():
-	playsong(2)
-
 	while True:
 		#pull for events using pygame
 		for event in pygame.event.get():
