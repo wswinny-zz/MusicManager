@@ -6,6 +6,7 @@ import MySQLdb
 import os
 import sys
 import pygame
+import random
 
 #set graphics driver to dummy for headless display
 #WARNING: This line makes it so you have to run the script with sudo
@@ -28,7 +29,9 @@ SONGEND = pygame.USEREVENT + 1
 
 songQueue = list() #Holds song but in what form name, id?
 songHistory = list() #Holds the play history of the queue
-playSet	= set([1,2,3,4,5,6,7,8,9]) #Holds elements of songQueue to be played
+songPtr = 0 #holds the currently selected song
+currentlyPlaying = -1 	#holds the currently playing song
+						#if this is -1 that means nothing is playing
 
 shuffle   = False							#true - on, false - off
 repeat    = False							#true - on, false - off
@@ -89,6 +92,30 @@ def repopulate():
 	for index in range(len(songQueue)):
 		playSet.add(index)
 
+def playNextSong(direction = 1):
+	availableQueue = list(set(songQueue) - set(songHistory))
+	availableQueueLength = len(availableQueue)
+
+	if currentlyPlaying != -1:
+		songHistory.append(currentlyPlaying) #adds the song to the history list
+
+	if availableQueueLength == 0:
+		if repeat:
+			repopulate()
+		else:
+			return
+
+	if direction == 1:
+		if shuffle:
+			randomSong = random.random() % availableQueueLength
+			playsong(availableQueue[randomSong])
+		if not shuffle:
+			nextSong = (availableQueue.index(songQueue[songPtr]) + 1) % availableQueueLength
+			playSong(availableQueue[nextSong])
+	else:
+		lastSongPlayed = songHistory.pop()
+		playSong(lastSongPlayed)
+
 def playsong(songID):
 	result = execQuery("SELECT artistName, songName FROM Song LEFT JOIN Artist ON Song.artist = Artist.idArtist WHERE idSong = " + str(songID) + ";")
 	artist = result[0][0]
@@ -101,6 +128,9 @@ def playsong(songID):
 	pygame.mixer.music.play(0)
 	pygame.mixer.music.set_endevent(SONGEND) #fires event when the song has stopped playing
 
+	songPtr = songQueue.index(songID)
+	currentlyPlaying = songID
+
 def runSongThread():
 	playsong(2)
 
@@ -108,15 +138,7 @@ def runSongThread():
 		#pull for events using pygame
 		for event in pygame.event.get():
 			if event.type == SONGEND:
-				if len(playSet) == 0 && repeat:
-					repopulate()
-				if len(playSet) > 0 && shuffle:
-					playsong(playSet.pop())
-				if len(playSet) > 0 && not shuffle:
-					nextSong = next(iter(playSet))
-
-					playsong(nextSong)
-					playSet.remove(nextSong)
+				playNextSong()
 
 		time.sleep(0.5)
 
