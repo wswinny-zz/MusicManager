@@ -99,6 +99,8 @@ def playNextSong(direction = 1):
 	if currentlyPlaying != -1:
 		songHistory.append(currentlyPlaying) #adds the song to the history list
 
+	currentlyPlaying = -1
+
 	if availableQueueLength == 0:
 		if repeat:
 			repopulate()
