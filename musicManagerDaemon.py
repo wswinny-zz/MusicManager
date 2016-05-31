@@ -48,18 +48,16 @@ def addSong(songID):
 		thePeoplesMutex.acquire()
 		songQueue.append(songID)
 
+		if len(sognQueue) - 1 == len(songHistory) && currentlyPlaying == -1:
+			playNextSong()
+
 	finally:
 		thePeoplesMutex.release()
 
 #adds all songs in a playlist to the songQueue by their ids and updates the playSet
 def addPlaylist(playlistID):
 	for row in execQuery("SELECT song FROM SongPlaylist WHERE playlist = " + str(playlistID) + ";"):
-		try:
-			thePeoplesMutex.acquire()
-			songQueue.append(row[0])
-			
-		finally:
-			thePeoplesMutex.release()
+		addSong(row[0])
 
 #clears the queue
 def clear():
