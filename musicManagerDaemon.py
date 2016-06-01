@@ -6,46 +6,9 @@ import os
 import sys
 import pygame
 import random
+import signal
 
 from threading import Thread
-
-#set graphics driver to dummy for headless display
-#WARNING: This line makes it so you have to run the script with sudo
-#os.environ["SDL_VIDEODRIVER"] = "dummy"
-
-#print "Main Thread: Dummy video drivers enabled"
-
-#init pygame
-pygame.init()
-pygame.mixer.init()
-
-pygame.display.init()
-screen = pygame.display.set_mode((100,100))
-
-print "Main Thread: PyGame init complete"
-
-#connect to database and setup cursor for queries
-db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5CFT^cft6", db="MusicManager")
-cur = db.cursor()
-
-print "Main Thread: Database connected"
-
-#where the music is stored
-musicDirectory = "/home/pi/Music/"
-SONGEND = pygame.USEREVENT + 1
-
-songQueue = list() #Holds song but in what form name, id?
-songHistory = list() #Holds the play history of the queue
-songPtr = 0 #holds the currently selected song
-currentlyPlaying = -1 	#holds the currently playing song
-						#if this is -1 that means nothing is playing
-
-shuffle   = False							#true - on, false - off
-repeat    = False							#true - on, false - off
-
-thePeoplesMutex = threading.Lock()
-
-print "Main Thread: Created all local varibles"
 
 def execQuery(query):
 	cur.execute(query)
@@ -97,9 +60,8 @@ def shuffle():
 	global shuffle
 	shuffle = not shuffle
 
-def repeat():
-	global repeat
-	repeat = not repeat
+def repeatPlaylist():
+	return
 
 def pause():
 	pygame.mixer.music.pause()
@@ -118,7 +80,7 @@ def playNextSong(direction = 1):
 	global currentlyPlaying
 	global songHistory
 
-	if currentlyPlaying != -1:
+	if currentlyPlaying != -1 and direction == 1:
 		songHistory.append(currentlyPlaying) #adds the song to the history list
 		print "Either Thread: Appending the song ", currentlyPlaying, " to the song history"
 
@@ -127,7 +89,7 @@ def playNextSong(direction = 1):
 	availableQueue = list(set(songQueue) - set(songHistory))
 	availableQueueLength = len(availableQueue)
 
-	if availableQueueLength == 0:
+	if (availableQueueLength == 0 and direction == 1) or len(songQueue) == 0:
 		if repeat:
 			repopulate()
 		else:
@@ -141,8 +103,9 @@ def playNextSong(direction = 1):
 			nextSong = (availableQueue.index(songQueue[songPtr]) + 1) % availableQueueLength
 			playSong(availableQueue[nextSong])
 	else:
-		lastSongPlayed = songHistory.pop()
-		playSong(lastSongPlayed)
+		if len(songHistory) > 0:
+			lastSongPlayed = songHistory.pop()
+			playSong(lastSongPlayed)
 
 def playSong(songID):
 	global songPtr
@@ -159,32 +122,80 @@ def playSong(songID):
 	#plays the song 1 time using the pygame audio lib
 	pygame.mixer.music.load(songpath)
 	pygame.mixer.music.play(0)
-	pygame.mixer.music.set_endevent(SONGEND) #fires event when the song has stopped playing
 
 	songPtr = songQueue.index(songID)
 	currentlyPlaying = songID
 
 def runSongThread():
-	while True:
-		#pull for events using pygame
-		for event in pygame.event.get():
-			if event.type == SONGEND:
-				playNextSong()
-				print "Thread 1: Song ended playing next song"
+	while running:
+		#pull to check if the mixer is no longer playing a song if so try to play somthing
+		if not pygame.mixer.music.get_busy():
+			playNextSong()
+			print "Thread 1: Player not busy playing next song"
 
 		time.sleep(0.5)
 
+def sighandler(signal, frame):
+	global running
+
+	print("Main Thread: Signal caught exiting gracefully")
+	running = False
+	sys.exit(0)
+
+#init pygame
+pygame.init()
+pygame.mixer.init()
+
+print "Main Thread: PyGame init complete"
+
+#connect to database and setup cursor for queries
+db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5CFT^cft6", db="MusicManager")
+cur = db.cursor()
+
+print "Main Thread: Database connected"
+
+#where the music is stored
+musicDirectory = "/home/pi/Music/"
+
+songQueue = list() #Holds song but in what form name, id?
+songHistory = list() #Holds the play history of the queue
+songPtr = 0 #holds the currently selected song
+currentlyPlaying = -1 	#holds the currently playing song
+						#if this is -1 that means nothing is playing
+
+shuffle   = False							#true - on, false - off
+repeat    = False							#true - on, false - off
+
+thePeoplesMutex = threading.Lock()
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+running = True
+thread = Thread(target = runSongThread)
+
+print "Main Thread: Created all local varibles"
+
 if __name__ == "__main__":
 
+	#Init signal handler
+	print "Main Thread: Trapping all signals"
+
+	signal.signal(signal.SIGINT, 	sighandler)
+	signal.signal(signal.SIGHUP, 	sighandler)
+	signal.signal(signal.SIGTERM, 	sighandler)
+	signal.signal(signal.SIGTSTP, 	sighandler)
+	signal.signal(signal.SIGQUIT, 	sighandler)
+
+	print "Main Thread: Signals handled"
+
 	try:
-		thread = Thread(target = runSongThread)
 		thread.start()
 
 		print "Main Thread: Created Thread 1"
 	except:
 		print "Error: unable to start thread"
 
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	
 	s.bind(('',42069))
 
 	while True:
@@ -209,7 +220,7 @@ if __name__ == "__main__":
 		if data[0] == 'c':
 			clear()
 		if data[0] == 'ron' or data[0] == 'roff':
-			repeat()
+			repeatPlaylist()
 		if data[0] == 'p':
 			pause()
 		if data[0] == 'r':
