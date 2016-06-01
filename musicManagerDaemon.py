@@ -116,14 +116,16 @@ def repopulate():
 
 def playNextSong(direction = 1):
 	global currentlyPlaying
-
-	availableQueue = list(set(songQueue) - set(songHistory))
-	availableQueueLength = len(availableQueue)
+	global songHistory
 
 	if currentlyPlaying != -1:
 		songHistory.append(currentlyPlaying) #adds the song to the history list
+		print "Either Thread: Appending the song ", currentlyPlaying, " to the song history"
 
 	currentlyPlaying = -1
+
+	availableQueue = list(set(songQueue) - set(songHistory))
+	availableQueueLength = len(availableQueue)
 
 	if availableQueueLength == 0:
 		if repeat:
@@ -134,7 +136,7 @@ def playNextSong(direction = 1):
 	if direction == 1:
 		if shuffle:
 			randomSong = int(random.random()) % availableQueueLength
-			playsong(availableQueue[randomSong])
+			playSong(availableQueue[randomSong])
 		if not shuffle:
 			nextSong = (availableQueue.index(songQueue[songPtr]) + 1) % availableQueueLength
 			playSong(availableQueue[nextSong])
@@ -142,7 +144,7 @@ def playNextSong(direction = 1):
 		lastSongPlayed = songHistory.pop()
 		playSong(lastSongPlayed)
 
-def playsong(songID):
+def playSong(songID):
 	global songPtr
 	global currentlyPlaying
 
@@ -151,6 +153,8 @@ def playsong(songID):
 	song = result[0][1]
 
 	songpath = musicDirectory + artist + "/" + song
+
+	print "Thread 1: Playing song ", song, " by artist ", artist
 
 	#plays the song 1 time using the pygame audio lib
 	pygame.mixer.music.load(songpath)
@@ -195,7 +199,7 @@ if __name__ == "__main__":
 		if data[0] == 's':
 			addSong(int(data[1]))
 		if data[0] == 'p':
-			addPlaylist(int(data[1]))
+			pause()
 		if data[0] == 'sf':
 			playNextSong(1)
 		if data[0] == 'sb':
