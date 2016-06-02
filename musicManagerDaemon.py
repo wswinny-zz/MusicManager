@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import socket
 import threading
 import time
@@ -56,12 +57,13 @@ def clear():
 	finally:
 		thePeoplesMutex.release()
 
-def shuffle():
+def shufflePlaylist():
 	global shuffle
 	shuffle = not shuffle
 
 def repeatPlaylist():
-	return
+	global repeat
+	repeat = not repeat
 
 def pause():
 	pygame.mixer.music.pause()
@@ -92,16 +94,17 @@ def playNextSong(direction = 1):
 	if (availableQueueLength == 0 and direction == 1) or len(songQueue) == 0:
 		if repeat:
 			repopulate()
+			availableQueue = list(set(songQueue) - set(songHistory))
+			availableQueueLength = len(availableQueue)
 		else:
 			return
 
 	if direction == 1:
 		if shuffle:
-			randomSong = int(random.random()) % availableQueueLength
+			randomSong = int(random.randRange(0, availableQueueLength)) % availableQueueLength
 			playSong(availableQueue[randomSong])
 		if not shuffle:
-			nextSong = (availableQueue.index(songQueue[songPtr]) + 1) % availableQueueLength
-			playSong(availableQueue[nextSong])
+			playSong(next(iter(availableQueue)))
 	else:
 		if len(songHistory) > 0:
 			lastSongPlayed = songHistory.pop()
@@ -216,7 +219,7 @@ if __name__ == "__main__":
 		if data[0] == 'sb':
 			playNextSong(-1)
 		if data[0] == 'shuf':
-			shuffle()
+			shufflePlaylist()
 		if data[0] == 'c':
 			clear()
 		if data[0] == 'rep':
