@@ -14,9 +14,8 @@
 	</head>
 	<body>
 		<form id='mainForm' class="form-horizontal">
-			<div class="form-group">
-				<label class="col-sm-3 control-label">Song List</label>
-				<div class="col-sm-9">
+			<div id="tree" class="form-group">
+				<div class="col-sm-12">
 					<div class='tree'>
 						<ul>
 							<?php
@@ -43,18 +42,17 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-sm-3 control-label">Controls</label>
-				<div class="col-sm-9">
+			<div id="controls" class="form-group">
+				<div class="col-sm-12">
 					<div class='controls'>
+						<p class="glyphicon glyphicon-repeat control repeat" aria-hidden="true"></p>
 						<p class="glyphicon glyphicon-play control play" aria-hidden="true"></p>
+						<p class="glyphicon glyphicon-random control shuffle" aria-hidden="true"></p>
 					</div>
 					<div class='controls'>
 						<p class="glyphicon glyphicon-backward control backward" aria-hidden="true"></p>
 						<p class="glyphicon glyphicon-pause control pause" aria-hidden="true"></p>
 						<p class="glyphicon glyphicon-forward control forward" aria-hidden="true"></p>
-					</div>
-					<div>
 					</div>
 				</div>
 			</div>
@@ -79,6 +77,14 @@
 
 			$( ".forward" ).click(function() {
 				sendMessageOverSocket('sf');
+			});
+
+			$( ".shuffle" ).click(function() {
+				sendMessageOverSocket('shuf');
+			});
+
+			$( ".repeat" ).click(function() {
+				sendMessageOverSocket('rep');
 			});
 		</script>
 	</body>

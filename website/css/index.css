@@ -1,7 +1,9 @@
 html, body
 {
-	width: 100%;
-	height: auto;
+	height: 100%;
+	width: auto;
+	margin: 0;
+	padding: 0;
 }
 
 .controls
@@ -11,8 +13,6 @@ html, body
 
 .control
 {
-	font-size: 32px;
-	color: white;
 	width: 40px;
 	height: 40px;
 	margin: 5px;
@@ -31,10 +31,23 @@ html, body
 
 #mainForm
 {
-	width: 500px;
+	height: 100%;
 	margin: 0 auto;
 	padding: 10px;
 
-	background: #B8B7B7;
-	border-radius: 20px;
+	font-size: 6vw;
+}
+
+#tree
+{
+	height: 80%;
+	overflow-y: scroll;
+	margin: 0;
+}
+
+#controls
+{
+	height: 20%;
+	margin: 0;
+	font-size: 8vw;
 }

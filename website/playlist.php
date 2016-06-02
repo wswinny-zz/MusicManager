@@ -20,11 +20,8 @@
 					<input type='text' class='form-control' id='playlistName' name='playlistName' placeholder='Playlist Name' required>
 				</div>
 			</div>
-			<div class='tree well'>
+			<div class='tree'>
 				<ul>
-					<li>
-						<span><i class='glyphicon glyphicon-music'></i> Music</span>
-						<ul>
 
 						<?php
 							$result = mysqli_query($con, "SELECT idSong, songName, artistName FROM Song LEFT JOIN Artist ON Song.artist = Artist.idArtist ORDER BY artistName;");
@@ -47,9 +44,6 @@
 								echo "</ul></li>";
 
 						?>
-
-						</ul>
-					</li>
 				</ul>
 			</div>
 			<div class="form-group">

@@ -215,14 +215,12 @@ if __name__ == "__main__":
 			playNextSong(1)
 		if data[0] == 'sb':
 			playNextSong(-1)
-		if data[0] == 'son' or data[0] == 'soff':
+		if data[0] == 'shuf':
 			shuffle()
 		if data[0] == 'c':
 			clear()
-		if data[0] == 'ron' or data[0] == 'roff':
+		if data[0] == 'rep':
 			repeatPlaylist()
-		if data[0] == 'p':
-			pause()
 		if data[0] == 'r':
 			resume()
 		if data[0] == 'pa':
