@@ -152,7 +152,7 @@ pygame.mixer.init()
 print "Main Thread: PyGame init complete"
 
 #connect to database and setup cursor for queries
-db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5CFT^cft6", db="MusicManager")
+db = MySQLdb.connect(host="localhost", user="root", passwd="XDR%xdr5", db="MusicManager")
 cur = db.cursor()
 
 print "Main Thread: Database connected"
