@@ -39,7 +39,7 @@
 
 			<div class="form-group">
 				<div class="col-sm-12">
-					<button type="submit" class="btn btn-default">Upload Song(s)</button>
+					<input type="submit" class="btn btn-default" name="submit" value="Upload Song(s)">
 				</div>
 			</div>
 		</form>

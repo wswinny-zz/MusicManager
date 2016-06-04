@@ -64,8 +64,14 @@
 
 				if(!is_dir($artistPath))
 				{
-					mkdir($artistPath);
+					$couldCreateDir = mkdir($artistPath);
 					$artistExists = false;
+
+					if(!$couldCreateDir)
+					{
+						echo "Could not create artist directory";
+						exit();
+					}
 				}
 				
 				if(file_exists($target_file))

@@ -14,28 +14,33 @@ APPASS=$1
 
 MYSQLPASSWD=$2
 
-echo "<?php \$con = mysqli_connect('localhost', 'root', '$MYSQLPASSWD', 'MusicManager'); ?>" >> ./html/database.php
-
-echo "You have chones the following for you access point: "
+echo "You have chosen the following for you access point: "
 echo "Network Name: $APSSID"
 echo "Network Pass: $APPASS"
 
-echo "Updateing apt-get..."
-sudo apt-get update
+echo "Your MySQL root password will be set to: $MYSQLPASSWD"
 
-echo "Installing nginx, php5, mysql, and mysql python"
+#replcae root passwords in database conntections with user defined password
+echo "Updateing MySQL password in the code..."
+echo "<?php \$con = mysqli_connect('localhost', 'root', '$MYSQLPASSWD', 'MusicManager'); ?>" >> ./html/database.php
+sed -i -e 's/tempRootDatabasePassword/'"$MYSQLPASSWD"'/g' musicManager.py
+
+echo "Updating apt-get..."
+sudo apt-get -qq update
+
+echo "Installing nginx, php5, mysql, mysql python, hostapd, and dnsmasq..."
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQLPASSWD"
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQLPASSWD"
-sudo apt-get install nginx php5-fpm mysql-server php5-mysql python-mysqldb hostapd dnsmasq -y
+sudo apt-get -qq install nginx php5-fpm mysql-server php5-mysql python-mysqldb hostapd dnsmasq -y
 
-echo "Moving nginx configs"
+echo "Configuring nginx..."
 sudo mv default /etc/nginx/sites-enabled/default
 sudo mv nginx.conf /etc/nginx/nginx.conf
 
-echo "Moving php.ini"
+echo "Configuring php..."
 sudo mv php.ini /etc/php5/fpm/php.ini
 
-echo "Configureing wireless AP"
+echo "Configuring hostapd and dnsmasq..."
 cat > /etc/dnsmasq.conf <<EOF
 interface=wlan0
 dhcp-range=10.0.0.2,10.0.0.5,255.255.255.0,12h
@@ -66,14 +71,18 @@ hostapd -B /etc/hostapd/hostapd.conf & > /dev/null 2>&1
 exit 0
 EOF
 
-echo "Installing database tables"
+echo "Setting up database tables..."
 mysql -h "localhost" -u root -p"$MYSQLPASSWD" < "createDatabase.sql"
 
-echo "Setting up webpage"
-sudo chown pi -R /var/www/html
-cp -R html/* /var/www/html/
+echo "Setting up webpage..."
+sudo cp -R html/* /var/www/html/
 
-echo "Setting up python script"
+sudo chown pi:www-data -R /var/www/html
+sudo chown pi:www-data -R /home/pi/Music
+
+sudo chmod g+w /home/pi/Music
+
+echo "Setting up python script..."
 
 mv musicManager.py /home/pi/musicManager.py
 chmod u+x /home/pi/musicManager.py
